@@ -1,12 +1,39 @@
 
 GrassmannOptim <- 
 function(objfun, W, sim_anneal=FALSE, temp_init=20, cooling_rate=2, 
-		max_iter_sa=100, eps_conv=1e-5, max_iter=100, eps_grad=1e-5, 
+		max_iter_sa=100, eps_conv=1e-5, max_iter=100, eps_grad=1e-5,
 		eps_f=.Machine$double.eps, verbose=FALSE)
 {
 	call <- match.call();
 
-	if ((is.null(W$Qt)) & (is.null(W$dim))) stop("Missing initial values")
+	if ((is.null(W$Qt)) & (is.null(W$dim))) stop("Missing initial values");
+
+	OrthoNorm <- function(X)
+	{
+		# This function does the Gram-Schmidt orthonormalization of X
+
+		X <- as.matrix(X); n<-nrow(X); p<-ncol(X); M <- NULL;
+
+		M <- cbind(M, X[,1]);
+
+		if(p > 1)
+		{
+     			for(k in 2:p) 
+			{
+				one <- rep(0, n);
+
+				for(i in 1:(k-1)) 
+				{
+					oneki <- as.vector((t(M[,i]) %*% X[,k])/(t(M[,i]) %*% M[,i]));
+
+					one <- one + oneki * M[,i];
+				}
+				M <- cbind(M, X[,k] - one);
+			}
+			M <- round(M, digits=4);
+		} 
+		return(apply(M, 2, function(x) x/sqrt(t(x)%*%x)))
+	}
 	
 	if (!is.null(W$Qt)) 
 	{
@@ -16,11 +43,10 @@ function(objfun, W, sim_anneal=FALSE, temp_init=20, cooling_rate=2,
 
 		dimx <- W$dim; p=dimx[2]; d <-dimx[1]; 
 
-		tempQ <- matrix(rnorm(p**2), nc=p); 
+		tempQ <- matrix(rnorm(p**2), ncol=p); 
 
 		Qt <- Re(eigen(t(tempQ)%*%tempQ)$vectors);
 	}
-
 
 	GetA <- function(alpha, p, d)
 	{
@@ -52,7 +78,7 @@ function(objfun, W, sim_anneal=FALSE, temp_init=20, cooling_rate=2,
 
 		if (is.null(alpha))
 		{
-			Qt <- W$Qt; p <- nrow(Qt); d <- W$dim[1]; alpha <- matrix(0, nr=d, nc=(p-d));
+			Qt <- W$Qt; p <- nrow(Qt); d <- W$dim[1]; alpha <- matrix(0, nrow=d, ncol=(p-d));
 
 			for(i in 1:d) 
 			{
@@ -60,7 +86,7 @@ function(objfun, W, sim_anneal=FALSE, temp_init=20, cooling_rate=2,
 				{
 					Q_tilde <- Qt;
 
-					Q_tilde[,i] <- cos(eps_grad) * Qt[,i] - sin(eps_grad) * Qt[,j]
+					Q_tilde[,i] <- cos(eps_grad) * Qt[,i] - sin(eps_grad) * Qt[,j];
 
 					W$Qt <- Q_tilde;
 
@@ -111,7 +137,7 @@ function(objfun, W, sim_anneal=FALSE, temp_init=20, cooling_rate=2,
 	{
 		# Sequence of values to generate candidate matrices 
 
-		seq_delta <- 0.8*exp(seq(-10,0,by=1))%x%c(-1, 1) ; 
+		seq_delta <- runif(1)*exp(seq(-10,0,by=1))%x%c(-1, 1) ; 
 
 		length_seq <- length(seq_delta); 
 
@@ -136,7 +162,7 @@ function(objfun, W, sim_anneal=FALSE, temp_init=20, cooling_rate=2,
 
 				fvalue <- objfun(W)$value; 
 
-				ws <- matrix(rnorm(d*(p-d)), nr=d, nc=(p-d));
+				ws <- matrix(rnorm(d*(p-d)), nrow=d, ncol=(p-d));
 
 				temp_alpha <- getGradient(objfun, W, fvalue, eps_grad) + sqrt(temperature)*ws;
 
@@ -192,7 +218,7 @@ function(objfun, W, sim_anneal=FALSE, temp_init=20, cooling_rate=2,
 
 	if (verbose) 
 	{
-		cat(sprintf("%s %s %s",  "iter","   Loglik", "         Gradient"), "\n");
+		cat(sprintf("%s %s %s",  "iter","   loglik", "         gradient"), "\n");
 
 		cat(sprintf("%4.0i\t%1.4e\t%1.4e\t",  iter, fvalue, norm_grad),"\n");
 	}
@@ -203,7 +229,8 @@ function(objfun, W, sim_anneal=FALSE, temp_init=20, cooling_rate=2,
 	{
 		converged=TRUE;
 
-	 	return(invisible(list(Qt=round(Qt, digits=4), d=d, norm_grads=norm_grads, fvalues=fvalues, converged=converged, call=call)))
+	 	return(invisible(list(Qt=round(Qt, digits=4), d=d, norm_grads=norm_grads, 
+				fvalues=fvalues, converged=converged, call=call)))
 	}
 
 	repeat  
@@ -214,7 +241,7 @@ function(objfun, W, sim_anneal=FALSE, temp_init=20, cooling_rate=2,
 
 		candidates_Qt <- vector("list");
 
-		seq_delta <- runif(1)*exp(seq(-10,0,by=1))%x%c(-1, 1) ; 
+		seq_delta <- runif(1)*exp(seq(-10,0,by=1))%x%c(-1, 1); 
 
 		length_seq <- length(seq_delta); 
 
