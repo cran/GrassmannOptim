@@ -1,8 +1,8 @@
 Package: GrassmannOptim
 Type: Package
 Title: Grassmann Manifold Optimization
-Version: 1.1
-Date: 2012-03-19
+Version: 1.2
+Date: 2012-07-08
 Author: Kofi Placid Adragni and Seongho Wu
 Maintainer: Kofi Placid Adragni <kofi@umbc.edu>
 Depends: Matrix
@@ -11,6 +11,6 @@ Description: Optimizing a function F(U), where U is a semi-orthogonal
         U
 URL: http://www.math.umbc.edu/~kofi/GrassmannOptim
 License: GPL (>= 2)
-Packaged: 2012-03-26 22:23:17 UTC; kofi
+Packaged: 2012-07-09 01:20:28 UTC; kofi
 Repository: CRAN
-Date/Publication: 2012-03-27 05:58:53
+Date/Publication: 2012-07-09 05:48:42
