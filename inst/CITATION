@@ -10,12 +10,12 @@ citEntry(entry = "Article",
   volume       = "50",
   number       = "5",
   pages        = "1--18",
-  url          = "http://www.jstatsoft.org/v50/i05/",
+  url          = "https://www.jstatsoft.org/v50/i05/",
 
   textVersion  =
   paste("Kofi P. Adragni, R. Dennis Cook, Seongho Wu (2012).",
         "GrassmannOptim: An R Package for Grassmann Manifold Optimization.",
         "Journal of Statistical Software, 50(5), 1-18.",
-        "URL http://www.jstatsoft.org/v50/i05/.")
+        "URL https://www.jstatsoft.org/v50/i05/.")
 )
 
